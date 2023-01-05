@@ -18,11 +18,11 @@ export class Restaurant {
 
   @Field((type) => String)
   @Column()
-  adress: string;
+  address: string;
 
   @Field((type) => String)
   @Column()
-  ownerName: string;
+  ownersName: string;
 
   @Field((type) => String)
   @Column()
