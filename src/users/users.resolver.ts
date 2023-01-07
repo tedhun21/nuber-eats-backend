@@ -16,6 +16,6 @@ export class UsersResolver {
 
   @Mutation((returns) => CreateAccountOutput)
   createAccout(@Args('input') createAcountInput: CreateAccountInput) {
-    
+    this.createAccout
   }
 }
