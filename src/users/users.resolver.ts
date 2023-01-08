@@ -3,6 +3,7 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dtos/createAccount.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UsersService } from './users.service';
 
 @Resolver()
@@ -38,4 +39,7 @@ export class UsersResolver {
       };
     }
   }
+
+  @Mutation((returns) => LoginOutput)
+  login(@Args('input') loginInput: LoginInput) {}
 }
