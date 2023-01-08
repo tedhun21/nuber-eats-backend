@@ -17,29 +17,27 @@ export class UsersResolver {
 
   @Mutation((returns) => CreateAccountOutput)
   async createAccount(
-    @Args('input') createAcountInput: CreateAccountInput,
+    @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
     try {
-      const { ok, error } = await await this.usersService.createAccount(
-        createAcountInput,
-      );
-      if (error) {
-        return {
-          ok,
-          error,
-        };
-      }
-      return {
-        ok,
-      };
-    } catch (e) {
+      return this.usersService.createAccount(createAccountInput);
+    } catch (error) {
       return {
         ok: false,
-        error: e,
+        error,
       };
     }
   }
 
   @Mutation((returns) => LoginOutput)
-  login(@Args('input') loginInput: LoginInput) {}
+  async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
+    try {
+      return this.usersService.login(loginInput);
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
 }
