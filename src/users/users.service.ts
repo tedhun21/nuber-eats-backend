@@ -49,12 +49,13 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
-      const token = jwt.sign({ id: user.id }, this.config.get('SECRET_KEY'), {
-        algorithm: 'RS256',
-      });
+      const token = jwt.sign(
+        { id: user.id, password: '12345' },
+        this.config.get('SECRET_KEY'),
+      );
       return {
         ok: true,
-        token: 'lalalala',
+        token,
       };
     } catch (error) {
       return {
