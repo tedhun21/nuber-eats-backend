@@ -82,7 +82,10 @@ export class UsersResolver {
     @Args('input') editProfileInput: EditProfileInput,
   ) {
     try {
-      this.userService.editProfile(authUser.id,editProfileInput)
+      this.userService.editProfile(authUser.id, editProfileInput);
+      return {
+        ok: true,
+      };
     } catch (error) {
       return {
         ok: false,
