@@ -12,13 +12,14 @@ export class MailService {
     this.sendEmail('testing', 'test');
   }
 
-  private async sendEmail(subject: string, content: string) {
+  private async sendEmail(subject: string, template: string) {
     const form = new FormData();
-    form.append('from', `Excited User <mailgun@${this.options.domain}>`);
+    form.append('from', `NuberEats<Nuber-Eats@${this.options.domain}>`);
     form.append('to', 'songjihun940409@gmail.com');
     form.append('subject', subject);
-    form.append('text', content);
-    console.log(form)
+    form.append('template', template);
+    form.append('v:code', 'qwerty');
+    form.append('v:username', 'songjihun!!!');
     const response = await got(
       `https://api.mailgun.net/v3/${this.options.domain}/messages`,
       {
@@ -31,6 +32,6 @@ export class MailService {
         body: form,
       },
     );
-    console.log(response);
+    console.log(response.body);
   }
 }
