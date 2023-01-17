@@ -40,8 +40,7 @@ export class UserService {
       const verificatiton = await this.verifications.save(
         this.verifications.create({ user }),
       );
-      console.log(verificatiton);
-      this.mailService.sendVerificationEmail(user.email, verificatiton.code)
+      this.mailService.sendVerificationEmail(user.email, verificatiton.code);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -103,8 +102,10 @@ export class UserService {
       if (email) {
         user.email = email;
         user.verified = false;
-        const verification = await this.verifications.save(this.verifications.create({ user }));
-        this.mailService.sendVerificationEmail(user.email, verification.code)
+        const verification = await this.verifications.save(
+          this.verifications.create({ user }),
+        );
+        this.mailService.sendVerificationEmail(user.email, verification.code);
       }
       if (password) {
         user.password = password;
