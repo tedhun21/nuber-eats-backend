@@ -32,7 +32,7 @@ export class UserService {
     try {
       const exists = await this.users.findOne({ where: { email } });
       if (exists) {
-        return { ok: false, error: 'There is a user with that email already' };
+        return { ok: false, error: 'There is a user with that email already.' };
       }
       const user = await this.users.save(
         this.users.create({ email, password, role }),
@@ -43,7 +43,7 @@ export class UserService {
       this.mailService.sendVerificationEmail(user.email, verificatiton.code);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: "Couldn't create account" };
+      return { ok: false, error: "Couldn't create account." };
     }
   }
 
@@ -56,14 +56,14 @@ export class UserService {
       if (!user) {
         return {
           ok: false,
-          error: 'User not found',
+          error: 'User not found.',
         };
       }
       const passwordCorrect = await user.checkPassword(password);
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: 'Wrong password',
+          error: 'Wrong password.',
         };
       }
       const token = this.jwtService.sign(user.id);
@@ -74,7 +74,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: "Can't log user in.",
       };
     }
   }
@@ -115,7 +115,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error: 'Could not update profile',
+        error,
       };
     }
   }
@@ -134,9 +134,9 @@ export class UserService {
           ok: true,
         };
       }
-      return { ok: false, error: 'Verification Not Found' };
+      return { ok: false, error: 'Verification Not Found.' };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could not verify email.' };
     }
   }
 }

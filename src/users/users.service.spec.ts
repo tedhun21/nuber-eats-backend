@@ -14,14 +14,14 @@ const mockRepository = () => ({
   findOneOrFail: jest.fn(),
 });
 
-const mockJwtService = {
+const mockJwtService = () => ({
   sign: jest.fn(() => 'signed-token'),
   verify: jest.fn(),
-};
+});
 
-const mockMailService = {
+const mockMailService = () => ({
   sendVerificationEmail: jest.fn(),
-};
+});
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -46,11 +46,11 @@ describe('UserService', () => {
         },
         {
           provide: JwtService,
-          useValue: mockJwtService,
+          useValue: mockJwtService(),
         },
         {
           provide: MailService,
-          useValue: mockMailService,
+          useValue: mockMailService(),
         },
       ],
     }).compile();
@@ -78,7 +78,7 @@ describe('UserService', () => {
       const result = await service.createAccount(createAccountArgs);
       expect(result).toMatchObject({
         ok: false,
-        error: 'There is a user with that email already',
+        error: 'There is a user with that email already.',
       });
     });
     it('should create a new user', async () => {
@@ -120,7 +120,7 @@ describe('UserService', () => {
     it('should fail on exception', async () => {
       usersRepository.findOne.mockRejectedValue(new Error());
       const result = await service.createAccount(createAccountArgs);
-      expect(result).toEqual({ ok: false, error: "Couldn't create account" });
+      expect(result).toEqual({ ok: false, error: "Couldn't create account." });
     });
   });
 
@@ -142,7 +142,7 @@ describe('UserService', () => {
       };
       usersRepository.findOne.mockResolvedValue(mockedUser);
       const result = await service.login(loginArgs);
-      expect(result).toEqual({ ok: false, error: 'Wrong password' });
+      expect(result).toEqual({ ok: false, error: 'Wrong password.' });
     });
     it('should return token if password correct', async () => {
       const mockedUser = {
@@ -154,6 +154,11 @@ describe('UserService', () => {
       expect(jwtService.sign).toHaveBeenCalledTimes(1);
       expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number));
       expect(result).toEqual({ ok: true, token: 'signed-token' });
+    });
+    it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.login(loginArgs);
+      expect(result).toEqual({ ok: false, error: "Can't log user in." });
     });
   });
 
@@ -169,12 +174,12 @@ describe('UserService', () => {
     it('should fail if no user is found', async () => {
       usersRepository.findOneOrFail.mockRejectedValue(new Error());
       const result = await service.findById(1);
-      expect(result).toEqual({ ok: false, error: 'User Not Found' });
+      expect(result).toEqual({ ok: false, error: 'User Not Found.' });
     });
   });
 
   describe('editProfile', () => {
-    it('should change eamil', async () => {
+    it('should change email', async () => {
       const oldUser = {
         email: 'nj@old.com',
         verified: true,
@@ -210,11 +215,34 @@ describe('UserService', () => {
         newVerification,
       );
 
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
       expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
         newUser.email,
         newVerification.code,
       );
     });
+    it('should change password', async () => {
+      const editProfileArgs = {
+        userId: 1,
+        input: { password: 'new.password' },
+      };
+      usersRepository.findOne.mockResolvedValue({
+        password: 'old',
+      });
+      const result = await service.editProfile(
+        editProfileArgs.userId,
+        editProfileArgs.input,
+      );
+      expect(usersRepository.save).toHaveBeenCalledTimes(1);
+      expect(usersRepository.save).toHaveBeenCalledWith(editProfileArgs.input);
+      expect(result).toEqual({ ok: true });
+    });
+    it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.editProfile(1, { email: '12' });
+      expect(result).toEqual({ ok: false, error: 'Could not update profile.' });
+    });
   });
+
   it.todo('verifyEmail');
 });
