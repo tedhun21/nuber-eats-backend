@@ -87,7 +87,7 @@ export class UserService {
         user: user,
       };
     } catch (error) {
-      return { ok: false, error: 'User Not Found' };
+      return { ok: false, error: 'User Not Found.' };
     }
   }
 
@@ -115,7 +115,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error:'Could not update profile.',
       };
     }
   }
