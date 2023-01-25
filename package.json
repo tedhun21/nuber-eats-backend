@@ -81,7 +81,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/mail.service.(t|j)s"
+      "**/*.service.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
