@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { UserProfileInput } from 'src/users/dtos/user-profile.dto';
+import { DataSource } from 'typeorm';
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
@@ -14,6 +13,21 @@ describe('UserModule (e2e)', () => {
 
     app = module.createNestApplication();
     await app.init();
+  });
+
+  afterAll(async () => {
+    const dataSource = new DataSource({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'songjihun',
+      password: '12345',
+      database: 'nuber-eats-test',
+    });
+    const connection = await dataSource.initialize();
+    await connection.dropDatabase();
+    await connection.destroy;
+    app.close();
   });
 
   it.todo('me');
