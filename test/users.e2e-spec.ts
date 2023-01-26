@@ -4,6 +4,12 @@ import { AppModule } from '../src/app.module';
 import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 
+jest.mock('got', () => {
+  return {
+    post: jest.fn(),
+  };
+});
+
 const GRAPHQL_ENDPOINT = '/graphql';
 
 describe('UserModule (e2e)', () => {
@@ -27,7 +33,6 @@ describe('UserModule (e2e)', () => {
       database: 'nuber-eats-test',
     });
     await dataSource.initialize();
-    await dataSource.driver.connect();
     await dataSource.dropDatabase();
     await dataSource.destroy();
     app.close();
@@ -53,6 +58,30 @@ describe('UserModule (e2e)', () => {
         .expect(200)
         .expect((response) => {
           expect(response.body.data.createAccount.ok).toBe(true);
+          expect(response.body.data.createAccount.error).toBe(null);
+        });
+    });
+    it('should fail if account already exists', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `mutation {
+          createAccount(input: {
+            email:"${EMAIL}",
+            password:"12345",
+            role:Owner
+          }) {
+            ok
+            error
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((response) => {
+          expect(response.body.data.createAccount.ok).toBe(false);
+          expect(response.body.data.createAccount.error).toBe(
+            'There is a user with that email already.',
+          );
         });
     });
   });
