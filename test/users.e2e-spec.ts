@@ -160,17 +160,19 @@ describe('UserModule (e2e)', () => {
 
   describe('userProfile', () => {
     let userId: number;
+
     beforeAll(async () => {
       const [user] = await usersRepository.find();
       userId = user.id;
     });
+
     it("should see a user's profile", () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
         .set('X-JWT', jwtToken)
         .send({
           query: `{
-          userProfile(userId:1){
+          userProfile(userId:${userId}){
             ok
             error
             user {
@@ -192,7 +194,6 @@ describe('UserModule (e2e)', () => {
               },
             },
           } = response;
-          console.log(response.body);
           expect(ok).toBe(true);
           expect(error).toBe(null);
           expect(id).toBe(userId);
@@ -204,7 +205,7 @@ describe('UserModule (e2e)', () => {
         .set('X-JWT', jwtToken)
         .send({
           query: `{
-          userProfile(userId:1){
+          userProfile(userId:666){
             ok
             error
             user {
@@ -230,8 +231,54 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  it.todo('me');
-  it.todo('userProfile');
+  describe('me', () => {
+    it('should find my profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `{
+          me {
+            email
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((response) => {
+          const {
+            body: {
+              data: {
+                me: { email },
+              },
+            },
+          } = response;
+          expect(email).toBe(testUser.EMAIL);
+        });
+    });
+    it('should not allow logged out user', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `{
+            me {
+            email
+          }
+        }`,
+        })
+        .expect(200)
+        .expect((response) => {
+          const {
+            body: {
+              errors: [{ message }],
+              data,
+            },
+          } = response;
+          expect(message).toBe('Forbidden resource');
+          expect(data).toBe(null);
+        });
+    });
+  });
+
   it.todo('editProfile');
   it.todo('verifyEmail');
 });
