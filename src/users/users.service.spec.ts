@@ -9,8 +9,9 @@ import { JwtService } from 'src/jwt/jwt.service';
 
 const mockRepository = () => ({
   findOne: jest.fn(),
-  save: jest.fn(),
+  count: jest.fn(),
   create: jest.fn(),
+  save: jest.fn(),
   findOneOrFail: jest.fn(),
   delete: jest.fn(),
 });
@@ -180,24 +181,37 @@ describe('UserService', () => {
   });
 
   describe('editProfile', () => {
+    const oldUser = {
+      email: 'nj@old.com',
+      verified: true,
+    };
+    const editProfileArgs = {
+      userId: 1,
+      input: { email: 'nj@new.com' },
+    };
+    const newVerification = {
+      code: 'code',
+    };
+    const newUser = {
+      verified: false,
+      email: editProfileArgs.input.email,
+    };
+    it('should fail if user exists', async () => {
+      const result = await service.editProfile(
+        editProfileArgs.userId,
+        editProfileArgs.input,
+      );
+      usersRepository.count.mockResolvedValue(0);
+      expect(usersRepository.count).toHaveBeenCalledTimes(1);
+      expect(usersRepository.count).toHaveBeenCalledWith({
+        where: { email: editProfileArgs.input.email },
+      });
+      expect(result).toEqual({
+        ok: false,
+        error: 'There is a user with that email already.',
+      });
+    });
     it('should change email', async () => {
-      const oldUser = {
-        email: 'nj@old.com',
-        verified: true,
-      };
-      const editProfileArgs = {
-        userId: 1,
-        email: 'nj@new.com',
-        input: { email: 'nj@new.com' },
-      };
-      const newVerification = {
-        code: 'code',
-      };
-      const newUser = {
-        verified: false,
-        email: editProfileArgs.input.email,
-      };
-
       usersRepository.findOne.mockResolvedValue(oldUser);
       verificationsRepository.create.mockReturnValue(newVerification);
       verificationsRepository.save.mockResolvedValue(newVerification);
@@ -222,6 +236,7 @@ describe('UserService', () => {
         newVerification.code,
       );
     });
+
     it('should change password', async () => {
       const editProfileArgs = {
         userId: 1,

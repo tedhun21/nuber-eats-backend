@@ -98,13 +98,22 @@ export class UserService {
     try {
       const user = await this.users.findOne({ where: { id: userId } });
       if (email) {
+        const isExists = await this.users.count({ where: { email } });
+        if (isExists !== 0) {
+          return {
+            ok: false,
+            error: 'There is a user with that email already.',
+          };
+        }
         user.email = email;
         user.verified = false;
+        await this.verifications.delete({ user: { id: user.id } });
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
         this.mailService.sendVerificationEmail(user.email, verification.code);
       }
+
       if (password) {
         user.password = password;
       }
@@ -115,7 +124,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error:'Could not update profile.',
+        error: 'Could not update profile.',
       };
     }
   }
