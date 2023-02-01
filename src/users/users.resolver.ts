@@ -26,7 +26,6 @@ export class UsersResolver {
   }
 
   @Mutation((returns) => LoginOutput)
-  @Role(['Any'])
   login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.UserService.login(loginInput);
   }
