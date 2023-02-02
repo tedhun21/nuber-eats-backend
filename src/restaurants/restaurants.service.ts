@@ -19,7 +19,6 @@ export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
-    @InjectRepository(Category)
     private readonly categories: CategoryRepository,
   ) {}
 
@@ -51,7 +50,7 @@ export class RestaurantService {
     editRestaurantInput: EditRestaurantInput,
   ): Promise<EditRestaurantOutput> {
     try {
-      const restaurant = await this.restaurants.findOneOrFail({
+      const restaurant = await this.restaurants.findOne({
         where: { id: editRestaurantInput.restaurantId },
       });
       if (!restaurant) {
@@ -81,7 +80,7 @@ export class RestaurantService {
       ]);
       return { ok: true };
     } catch {
-      return { ok: false };
+      return { ok: false, error: 'Could not edit Restaurant' };
     }
   }
 }

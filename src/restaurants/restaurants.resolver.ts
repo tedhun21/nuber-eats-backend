@@ -1,8 +1,7 @@
-import { SetMetadata } from '@nestjs/common';
 import { Resolver, Args, Mutation } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
-import { User, UserRole } from 'src/users/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -33,9 +32,9 @@ export class RestaurantResolver {
   @Mutation((returns) => EditRestaurantOutput)
   @Role(['Owner'])
   editRestaurant(
-    @AuthUser() authUser: User,
+    @AuthUser() owner: User,
     @Args('input') editRestaurantInput: EditRestaurantInput,
-  ) {
-    return this.restaurantService.editRestaurant(authUser, editRestaurantInput);
+  ): Promise<EditRestaurantOutput> {
+    return this.restaurantService.editRestaurant(owner, editRestaurantInput);
   }
 }
