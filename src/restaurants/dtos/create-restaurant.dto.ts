@@ -4,6 +4,7 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
 export class CreateRestaurantInput extends PickType(Restaurant, [
+  'id',
   'name',
   'coverImg',
   'address',
