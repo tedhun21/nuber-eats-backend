@@ -121,4 +121,10 @@ export class RestaurantService {
       return { ok: false, error: 'Could not load categories' };
     }
   }
+
+  async countRestaurants(category: Category) {
+    return await this.restaurants.count({
+      where: { category: { id: category.id } },
+    });
+  }
 }
