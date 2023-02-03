@@ -4,7 +4,7 @@ import { TypeOrmCustomModule } from 'src/db/typeorm-custom.module';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
-import { RestaurantResolver } from './restaurants.resolver';
+import { CategoryResolver, RestaurantResolver } from './restaurants.resolver';
 import { RestaurantService } from './restaurants.service';
 
 @Module({
@@ -12,6 +12,6 @@ import { RestaurantService } from './restaurants.service';
     TypeOrmModule.forFeature([Restaurant, Category]),
     TypeOrmCustomModule.forCustomRepository([CategoryRepository]),
   ],
-  providers: [RestaurantResolver, RestaurantService],
+  providers: [RestaurantResolver, CategoryResolver, RestaurantService],
 })
 export class RestaurantsModule {}
