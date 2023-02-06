@@ -13,6 +13,6 @@ export class SearchRestaurantInput extends PaginationInput {
 
 @ObjectType()
 export class SearchRestaurantOutput extends PaginationOutput {
-  @Field((type) => Restaurant, { nullable: true })
-  restaurant?: Restaurant;
+  @Field((type) => [Restaurant], { nullable: true })
+  restaurants?: Restaurant[];
 }
