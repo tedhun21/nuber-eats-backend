@@ -9,10 +9,12 @@ import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
 } from './dtos/create-restaurant.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
 import {
   DeleteRestaurantInput,
   DeleteRestaurantOutput,
 } from './dtos/delete-restaurant.dto';
+import { EditDishInput } from './dtos/edit-dish.dto';
 import {
   EditRestaurantInput,
   EditRestaurantOutput,
@@ -246,7 +248,6 @@ export class RestaurantService {
           error: "You can't do that.",
         };
       }
-      console.log(restaurant);
       await this.dishes.save(
         this.dishes.create({ ...createDishInput, restaurant }),
       );
@@ -259,6 +260,54 @@ export class RestaurantService {
         ok: false,
         error: 'Could not create dish',
       };
+    }
+  }
+
+  async editDish(owner: User, editDishInput: EditDishInput) {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: editDishInput.dishId },
+        relations: ['restaurant'],
+      });
+      if (!dish) {
+        return { ok: false, error: 'Dish not found' };
+      }
+      if (owner.id !== dish.restaurant.ownerId) {
+        return { ok: false, error: "You can't do that" };
+      }
+      await this.dishes.save([{ id: editDishInput.dishId, ...editDishInput }]);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: 'Could not edit dish' };
+    }
+  }
+
+  async deleteDish(
+    owner,
+    { dishId }: DeleteDishInput,
+  ): Promise<DeleteDishOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: dishId },
+        relations: ['restaurant'],
+      });
+      console.log(dish);
+      if (!dish) {
+        return {
+          ok: false,
+          error: 'Could not found dish',
+        };
+      }
+      if (owner.id !== dish.restaurant.ownerId) {
+        return {
+          ok: false,
+          error: "You can't do that",
+        };
+      }
+      await this.dishes.delete(dish.id);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: 'Could not delete dish' };
     }
   }
 }
