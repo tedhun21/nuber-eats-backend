@@ -196,7 +196,7 @@ export class RestaurantService {
         relations: ['menu'],
       });
       if (!restaurant) {
-        return { ok: false, error: 'Restaurant no found' };
+        return { ok: false, error: 'Restaurant not found' };
       }
       return {
         ok: true,
