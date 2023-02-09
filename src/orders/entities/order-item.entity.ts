@@ -12,8 +12,8 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 export class OrderItemOption {
   @Field((type) => String)
   name: string;
-  @Field((type) => DishChoice, { nullable: true })
-  choice?: DishChoice;
+  @Field((type) => String, { nullable: true })
+  choices: String;
   @Field((type) => Int, { nullable: true })
   extra?: number;
 }
