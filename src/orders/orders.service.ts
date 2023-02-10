@@ -36,43 +36,53 @@ export class OrderService {
           error: 'Restaurant not found',
         };
       }
+      let orderFinalPrice = 0;
+      let orderItems: OrderItem[] = [];
       for (const item of items) {
         const dish = await this.dishes.findOne({ where: { id: item.dishId } });
         if (!dish) {
           return { ok: false, error: 'Dish not found' };
         }
-        console.log(`Dish price: ${dish.price}`);
+        let dishFinalPrice = dish.price;
         for (const itemOption of item.options) {
           const dishOption = dish.options.find(
             (dishOption) => dishOption.name === itemOption.name,
           );
           if (dishOption) {
             if (dishOption.extra) {
-              console.log(`$USD + ${dishOption.extra}`);
+              dishFinalPrice += dishOption.extra;
             } else {
               const dishOptionChoice = dishOption.choices.find(
                 (optionChoice) => optionChoice.name === itemOption.choice,
               );
               if (dishOptionChoice) {
                 if (dishOptionChoice.extra) {
-                  console.log(`$USD + ${dishOptionChoice.extra}`);
+                  dishFinalPrice += dishOptionChoice.extra;
                 }
               }
             }
           }
         }
+        orderFinalPrice = orderFinalPrice + dishFinalPrice;
+        const orderItem = await this.orderItems.save(
+          this.orderItems.create({
+            dish,
+            options: item.options,
+          }),
+        );
+        orderItems.push(orderItem);
       }
-
-      /* const order = await this.orders.save(
+      await this.orders.save(
         this.orders.create({
           customer,
           restaurant,
+          total: orderFinalPrice,
+          items: orderItems,
         }),
       );
-      console.log(order); */
       return { ok: true };
     } catch (error) {
-      return { ok: false };
+      return { ok: false, error: 'Could not create order' };
     }
   }
 }
