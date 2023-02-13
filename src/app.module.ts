@@ -66,9 +66,15 @@ import { OrderItem } from './orders/entities/order-item.entity';
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
-      context: ({ req }) => ({
-        user: req['user'],
-      }),
+      context: ({ req }) => {
+        console.log(req.user);
+        return {
+          user: req['user'],
+        };
+      },
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
