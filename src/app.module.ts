@@ -67,13 +67,13 @@ import { OrderItem } from './orders/entities/order-item.entity';
       driver: ApolloDriver,
       autoSchemaFile: true,
       context: ({ req }) => {
-        console.log(req.user);
         return {
           user: req['user'],
         };
       },
       subscriptions: {
         'graphql-ws': true,
+        'subscriptions-transport-ws': true,
       },
     }),
     JwtModule.forRoot({
