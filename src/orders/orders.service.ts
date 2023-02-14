@@ -94,7 +94,6 @@ export class OrderService {
     { status }: GetOrdersInput,
   ): Promise<GetOrdersOutput> {
     try {
-      console.log(status);
       let orders: Order[] = [];
       if (user.role === UserRole.Client) {
         orders = await this.orders.find({

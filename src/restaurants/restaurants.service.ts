@@ -291,7 +291,6 @@ export class RestaurantService {
         where: { id: dishId },
         relations: ['restaurant'],
       });
-      console.log(dish);
       if (!dish) {
         return {
           ok: false,
