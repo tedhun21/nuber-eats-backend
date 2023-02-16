@@ -22,6 +22,7 @@ export class Payment extends CoreEntity {
   @ManyToOne((type) => Restaurant)
   restaurant: Restaurant;
 
+  @Field((type) => Int)
   @RelationId((payment: Payment) => payment.restaurant)
   restaurantId: number;
 }
