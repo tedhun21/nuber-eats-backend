@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Cron, Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -7,7 +8,7 @@ import {
   CreatePaymentInput,
   CreatePaymentOutput,
 } from './dtos/create-payment.dto';
-import { GetPaymentOutput } from './dtos/get-payments.dto';
+import { GetPaymentsOutput } from './dtos/get-payments.dto';
 import { Payment } from './entities/payment.entity';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class PaymentService {
     private readonly payments: Repository<Payment>,
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async createPayment(
@@ -46,16 +48,34 @@ export class PaymentService {
     }
   }
 
-  async getPayments(user: User): Promise<GetPaymentOutput> {
+  async getPayments(user: User): Promise<GetPaymentsOutput> {
     try {
-      const payments = await this.payments.find({ where: { userId: user.id } });
-      if (!payments) {
-        return { ok: false, error: 'Could not find any payments' };
-      }
-      console.log(payments);
-      return { ok: true, payments };
+      const payments = await this.payments.find({
+        where: { user: { id: user.id } },
+      });
+      return {
+        ok: true,
+        payments,
+      };
     } catch (error) {
       return { ok: false, error: 'Could not load payments.' };
     }
+  }
+
+  @Cron('30 * * * * *', {
+    name: 'myJob',
+  })
+  checkForPayments() {
+    console.log('Checking for payments....(cron)');
+    const job = this.schedulerRegistry.getCronJob('myJob');
+    job.stop();
+  }
+  @Interval(30000)
+  checkForPaymentsI() {
+    console.log('Checking for payments....(interval)');
+  }
+  @Timeout(20000)
+  afterSaters() {
+    console.log('Congrats!');
   }
 }

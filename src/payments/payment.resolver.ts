@@ -6,9 +6,9 @@ import {
   CreatePaymentInput,
   CreatePaymentOutput,
 } from './dtos/create-payment.dto';
-import { GetPaymentOutput } from './dtos/get-payments.dto';
 import { Payment } from './entities/payment.entity';
 import { PaymentService } from './payment.service';
+import { GetPaymentsOutput } from './dtos/get-payments.dto';
 
 @Resolver((of) => Payment)
 export class PaymentResolver {
@@ -23,9 +23,9 @@ export class PaymentResolver {
     return this.paymentService.createPayment(owner, createPaymentInput);
   }
 
-  @Query((returns) => GetPaymentOutput)
+  @Query((returns) => GetPaymentsOutput)
   @Role(['Owner'])
-  getPayments(@AuthUser() user: User): Promise<GetPaymentOutput> {
+  getPayments(@AuthUser() user: User): Promise<GetPaymentsOutput> {
     return this.paymentService.getPayments(user);
   }
 }
