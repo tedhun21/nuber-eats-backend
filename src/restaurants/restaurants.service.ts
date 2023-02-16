@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { ILike, Repository } from 'typeorm';
+import { ILike, LessThan, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
@@ -314,5 +315,18 @@ export class RestaurantService {
     } catch (error) {
       return { ok: false, error: 'Could not delete dish' };
     }
+  }
+
+  @Interval(2000)
+  async checkPromotedRestaurants() {
+    const restaurants = await this.restaurants.find({
+      where: { isPromoted: true, promotedUntil: LessThan(new Date()) },
+    });
+    console.log(restaurants);
+    restaurants.forEach(async (restaurant) => {
+      restaurant.isPromoted = false;
+      restaurant.promotedUntil = null;
+      await this.restaurants.save(restaurant);
+    });
   }
 }
