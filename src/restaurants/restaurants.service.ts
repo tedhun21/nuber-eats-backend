@@ -20,6 +20,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
 import { RestaurantInput } from './dtos/restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import {
@@ -156,18 +157,21 @@ export class RestaurantService {
       }
       const restaurants = await this.restaurants.find({
         where: { category: { id: category.id } },
+        relations: ['menu'],
         take: 25,
         skip: (page - 1) * 25,
         order: {
           isPromoted: 'DESC',
         },
       });
+      console.log(restaurants);
       const totalResults = await this.countRestaurants(category);
       return {
         ok: true,
         restaurants,
         category,
         totalPages: Math.ceil(totalResults / 25),
+        totalResults,
       };
     } catch (error) {
       return { ok: false, error: 'Could not load category' };
@@ -328,5 +332,22 @@ export class RestaurantService {
       restaurant.promotedUntil = null;
       await this.restaurants.save(restaurant);
     });
+  }
+
+  async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+    try {
+      const restaurants = await this.restaurants.find({
+        where: { owner: { id: owner.id } },
+      });
+      return {
+        restaurants,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not find restaurants.',
+      };
+    }
   }
 }
