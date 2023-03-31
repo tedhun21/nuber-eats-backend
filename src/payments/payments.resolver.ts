@@ -7,7 +7,7 @@ import {
   CreatePaymentOutput,
 } from './dtos/create-payment.dto';
 import { Payment } from './entities/payment.entity';
-import { PaymentService } from './payment.service';
+import { PaymentService } from './payments.service';
 import { GetPaymentsOutput } from './dtos/get-payments.dto';
 
 @Resolver((of) => Payment)

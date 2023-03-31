@@ -195,7 +195,7 @@ type EditRestaurantOutput {
 type MyRestaurantOutput {
   error: String
   ok: Boolean!
-  restaurant: Restaurant!
+  restaurant: Restaurant
 }
 
 type MyRestaurantsOutput {
