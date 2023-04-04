@@ -22,6 +22,7 @@ import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { UploadsModule } from './uploads/uploads.module';
+import { Context } from 'apollo-server-core';
 
 @Module({
   imports: [
@@ -69,16 +70,25 @@ import { UploadsModule } from './uploads/uploads.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
-        'graphql-ws': true,
         'subscriptions-transport-ws': {
-          onConnect: (connectionParams: any) => ({
-            token: connectionParams['x-jwt'],
-          }),
+          onConnect: (connectionParams) => {
+            return { token: connectionParams['x-jwt'] };
+          },
+        },
+        'graphql-ws': {
+          onConnect: (context: Context<any>) => {
+            const { connectionParams, extra } = context;
+            extra.token = connectionParams['x-jwt'];
+          },
         },
       },
-      context: ({ req }) => ({
-        token: req.headers['x-jwt'],
-      }),
+      context: ({ req, extra }) => {
+        if (extra) {
+          return { token: extra.token };
+        } else {
+          return { token: req.headers['x-jwt'] };
+        }
+      },
       cors: {
         origin: 'http://localhost:3000',
         credentials: true,

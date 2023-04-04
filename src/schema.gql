@@ -229,6 +229,7 @@ type SearchRestaurantOutput {
 type CreateOrderOutput {
   error: String
   ok: Boolean!
+  orderId: Int
 }
 
 type GetOrdersOutput {
@@ -400,7 +401,7 @@ input CreateOrderInput {
 
 input CreateOrderItemInput {
   dishId: Int!
-  options: [OrderItemOptionInputType!]!
+  options: [OrderItemOptionInputType!]
 }
 
 input OrderItemOptionInputType {
